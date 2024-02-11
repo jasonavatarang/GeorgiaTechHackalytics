@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Spotty Too Ho</title>
+      <link rel="icon" type="image/x-icon" href="./static/logo.png">
+
+    <!-- Include Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <style>
+    .semi-transparent {
+        background-color: rgba(255, 255, 255, 0.5); /* White with 50% opacity */
+        border-radius: 10px; /* Optional: adds rounded corners */
+        padding: 20px; /* Optional: adds some padding inside the container */
+    }
+    .widget-container {
+      border: 2px solid #007bff; /* Bootstrap primary color */
+      border-radius: 5px;
+      padding: 20px;
+      margin-top: 20px;
+      display: none; /* Initially hidden */
+  }
+  
+</style>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+          <img
+            src="{{url_for('static', filename='logo.png')}}"
+            alt="Logo"
+            width="30"
+            height="24"
+            class="d-inline-block align-text-top"
+          />
+          Basketball Hotspot Analyzer
+        </a>
+        <a class="navbar-brand" href="https://github.com/jasonavatarang/GTHackathon2024">Github Repo</a>
+      </div>
+    </nav>
+
+    <img src="static/basketball-img.jpg" alt="Description of the image" style="width: 100%; height: 20%;">
+
+
+
+    <div class="container my-5">
+      <div class="row justify-content-center">
+          <!-- Left Image Column -->
+    <div class="col-md-2 d-flex align-items-center justify-content-end">
+      <img src="static/goats shooting.jpg" alt="Left Image" style="max-width: 100%;">
+    </div>
+        <div class="col-md-8 text-center">
+          <h2 class="mb-4">
+            <img src="{{url_for('static', filename='logo.png')}}" width="50" />
+            Clustering
+          </h2>
+
+          <div class="card">
+            <div class="card-body">
+              <p>Set the input values to predict a segment.</p>
+              <form
+                action="/predict"
+                method="POST"
+                class="row g-3 justify-content-center"
+              >
+                <div class="col-md-6">
+                  <label for="player_name" class="form-label">Player First Name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="player_name"
+                    name="player_name"
+                  />
+                </div>
+
+                <div class="col-md-6">
+                  <label for="last_name" class="form-label">Player Last Name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="last_name"
+                    name="last_name"
+                  />
+                </div>
+          <!-- Radio buttons -->
+<!-- Radio buttons -->
+<fieldset class="mb-3">
+  <legend class="form-label">2/3 Pointers</legend>
+  <div class="form-check">
+      <input class="form-check-input" type="radio" name="point" id="two-pointers" value="2-pt" checked>
+      <label class="form-check-label" for="two-pointers">2-pt</label>
+  </div>
+  <div class="form-check">
+      <input class="form-check-input" type="radio" name="point" id="three-pointers" value="3-pt">
+      <label class="form-check-label" for="three-pointers">3-pt</label>
+  </div>
+  <div class="form-check">
+      <input class="form-check-input" type="radio" name="point" id="both-pointers" value="Both">
+      <label class="form-check-label" for="both-pointers">Both</label>
+  </div>
+</fieldset>
+
+                
+                </div>
+                <div class="row">
+                  <!-- Start Date -->
+                  <div class="col-md-6">
+                    <label for="start-date" class="form-label">Start Date</label>
+                    <input
+                      type="date"
+                      class="form-control"
+                      id="start-date"
+                      name="start-date"
+                    />
+                  </div>
+                
+                  <!-- End Date -->
+                  <div class="col-md-6">
+                    <label for="end-date" class="form-label">End Date</label>
+                    <input
+                      type="date"
+                      class="form-control"
+                      id="end-date"
+                      name="end-date"
+                    />
+                  </div>
+                </div>
+                
+
+                <div class="col-12" style="padding-top: 20px; padding-bottom: 20px">
+                  <button type="submit" class="btn btn-primary" >
+                    Predict now!
+                  </button>
+                </div>
+              </form>
+              
+            
+  
+            </div>
+          </div>
+          <div class="col-md-2 d-flex align-items-center">
+            <img src="static/boondocks__riley.jpg" alt="Right Image" style="max-width: 100%;">
+          </div>
+      
+          <div class="container mt-5">
+            <div class="row">
+                <div class="col-md-8 offset-md-2">
+                    <!-- Semi-transparent widget/container -->
+                    
+                    <h2 class="col-md-8 offset-md-2">{{title}}</h2>
+                    <div id="plotly-plot">{{ plot_div|safe }}</div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        
+        
+    <!-- Assuming this is your filter widget container -->
+<div id="filter-widget" style="display: none;">
+  <!-- Your filters and slider bars here -->
+  <div class="container">
+    <div class="row">
+        <div class="col-md-6 mx-auto">
+            <!-- Semi-transparent container -->
+            <div class="semi-transparent p-4">
+                <form
+                action="/filter"
+                method="POST"
+                >
+                    <h4 class="mb-3">Preferences</h4>
+
+                <!-- Slider bar for Epsilon Hyperparameter -->
+<!-- index.html -->
+<input type="range" id="epsilonSlider" min="0.1" max="5.0" step="0.1" value="0.5" onchange="updateGraph()">
+<input type="range" id="minSamplesSlider" min="1" max="10" step="1" value="5" onchange="updateGraph()">
+<div id="plotDiv"></div>
+
+<script>
+function updateGraph() {
+    const epsilon = document.getElementById('epsilonSlider').value;
+    const min_samples = document.getElementById('minSamplesSlider').value;
+
+    fetch('/update_plot', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ epsilon: epsilon, min_samples: min_samples }),
+    })
+    .then(response => response.text())
+    .then(plotHtml => {
+        document.getElementById('plotDiv').innerHTML = plotHtml;
+    });
+}
+</script>
+
+
+                    <!-- Radio buttons -->
+                    <fieldset class="mb-3">
+                        <legend class="form-label">Made/Miss Attempt</legend>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="madeMiss" id="made" value="Made" checked>
+                            <label class="form-check-label" for="made">Made</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="madeMiss" id="miss" value="Miss">
+                            <label class="form-check-label" for="miss">Miss</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="madeMiss" id="both" value="Both">
+                            <label class="form-check-label" for="both">Both</label>
+                        </div>
+                    </fieldset>
+
+                    <!-- Submit button -->
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      var plotDiv = document.getElementById('plotly-plot');
+      var filterWidget = document.getElementById('filter-widget');
+  
+      // Check if plotDiv is visible (e.g., contains content)
+      if (plotDiv.innerHTML.trim() !== '') {
+          filterWidget.style.display = 'block'; // Show the filter widget
+      } else {
+          filterWidget.style.display = 'none'; // Hide the filter widget
+      }
+  });
+  </script>
+  
+
+          </body>
+          </div>
+        </div>
+      </div>
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+        </head>
+        <body>
+
+          
+
+          
+        </body>
+        </div>
+      </div>
+    </div>
+  </body>
+  <footer class="bg-body-tertiary text-center text-lg-start">
+    <!-- Grid container -->
+    <div class="container p-4">
+      <!--Grid row-->
+      <div class="row">
+        <!--Grid column-->
+        <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
+          <h5 class="text-uppercase">Note from Authors</h5>
+  
+          <p>
+            We want to show our love and curiosity for the game. Thank you!!!!
+          </p>
+        </div>
+        <!--Grid column-->
+  
+        <!--Grid column-->
+        <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
+          <h5 class="text-uppercase">Contributors</h5>
+  
+          <p>
+            <ui>
+              <li>Jason</li>
+              <li>Mattherw</li>
+              <li>Ezzard</li>
+            </ui>
+          </p>
+        </div>
+        <!--Grid column-->
+      </div>
+      <!--Grid row-->
+    </div>
+    <!-- Grid container -->
+  
+    <!-- Copyright -->
+    <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
+      © 2024 Copyright:
+      <a class="text-body" href="https://github.com/jasonavatarang/GTHackathon2024">Reference</a>
+    </div>
+    <!-- Copyright -->
+  </footer>
+</html>
